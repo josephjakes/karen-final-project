@@ -1,0 +1,43 @@
+.fancyButtonRed {
+display: inline-block;
+padding: 15px 15px;
+font-size: 24px;
+cursor: pointer;
+text-align: center;
+text-decoration: none;
+outline: none;
+color: #fff;
+background-color: #AF504C;
+border: none;
+box-shadow: 0 9px #999;
+}
+.fancyButtonRed:hover {background-color: #8e413e}
+.fancyButtonRed:active {
+background-color: #8e413e;
+box-shadow: 0 5px #666;
+transform: translateY(4px);
+}
+
+#jspsychTargetMLP {
+text-align: center;
+position: absolute;
+top: 0%;
+left: 50%;
+margin-top: 0%;
+margin-left:-50%;
+height: 100%;
+width: 100%;
+overflow-y: auto;
+overflow-x: auto;
+font-family: "Segoe UI", Arial, sans-serif;
+font-size: 120%;
+color: black;
+}
+
+body {background-color: white;}
+
+html, body {
+margin: 0;
+height: 100%;
+width: 100%;
+}
