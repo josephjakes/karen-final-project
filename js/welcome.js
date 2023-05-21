@@ -1,6 +1,6 @@
-var welcome = {};
+let welcome = {};
 
-var studyName = 'Target detection';
+let studyName = 'Target detection';
 
 
 // --------------  things that vary from task to task --------------
@@ -167,7 +167,7 @@ welcome.section.demographics =
 
 welcome.helpers = {};
 welcome.helpers.getRadioButton = function(name) { // get the value of a radio button
-    var i, radios = document.getElementsByName(name);
+    let i, radios = document.getElementsByName(name);
     for (i = 0; i < radios.length; i = i + 1) {
         if (radios[i].checked) {
             return (radios[i].value);
@@ -176,13 +176,13 @@ welcome.helpers.getRadioButton = function(name) { // get the value of a radio bu
     return ("NA");
 }
 welcome.helpers.setDisplay = function(theClass, theValue) { // toggle display status
-    var i, classElements = document.getElementsByClassName(theClass);
+    let i, classElements = document.getElementsByClassName(theClass);
     for (i = 0; i < classElements.length; i = i + 1) {
         classElements[i].style.display = theValue;
     }
 }
 welcome.helpers.setVisibility = function(theClass, theValue) { // toggle visibility
-    var i, classElements = document.getElementsByClassName(theClass);
+    let i, classElements = document.getElementsByClassName(theClass);
     for (i = 0; i < classElements.length; i = i + 1) {
         classElements[i].style.visibility = theValue;
     }

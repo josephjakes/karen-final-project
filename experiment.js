@@ -7,111 +7,100 @@
 //Debriefed, with a re-statement of #3 (this will be the first time the other half of the participants see this)
 //If participants hit a “terminate experiment” at any point during 1-6, they will be brought to #7.
 
+import {
+  trialsPerDistractCond,
+  numDistractConditions,
+  trialsPerBaselineType,
+  itiDuration,
+  feedbackDuration,
+  finalStandardDuration,
+  finalDistractDuration,
+  pracDurSteps,
+  pracNperstep,
+  numMemBlocks,
+  numMemPics,
+  numFoilPics,
+  fixationDuration,
+  firstPracTrialDur,
+  memConditionsTotal,
+  initialPauseDuration,
+} from './modules/pracDurSteps.js'
+
+// import { imageFilenames, positiveImageFilePaths, neutralImageFilePaths, previewNegativeFileNames } from './modules/imageFilenames.js'
+import { welcome, welcome1, welcome2 } from './modules/welcome.js'
+import { demographics } from './modules/demographics.js'
+
+import { debrief } from './modules/debrief.js'
+
+// have to define preview images
+import { fixationCross, imageFilenames, picStimuli, positiveImageFilePaths, neutralImageFilePaths, previewNegativeFileNames, previewPositiveFileNames } from './modules/newImageFilenames.js'
+
+import { previewPositiveFilenames, positiveFileNames, neutFilenames, previewNegFilenames, standardFilenames, target0Filenames, target1Filenames } from "./modules/imageFilenames.js"
+
+let lightnessVal = 100
 document.body.style.backgroundColor = 'hsl(0,0%,' + lightnessVal + '%)'
 
 Math.seedrandom()
-rSeed = Math.floor(Math.random() * 9999999)
+const rSeed = Math.floor(Math.random() * 9999999)
 Math.seedrandom(rSeed)
 
 //*** declare some global variables
 
-var today = new Date() //helpful to have in the data file
-var date =
+let today = new Date() //helpful to have in the data file
+let date =
   today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
-var time =
+let time =
   today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds()
-var dateTime = date + ' ' + time
+let dateTime = date + ' ' + time
 
-var realVersion = true
-var jatosVersion = false
-var instructVersion = Math.round(Math.random()) // 0 = no instructions and 1 = given fake/staged instructions
+let realVersion = true
+let jatosVersion = false
+let instructVersion = Math.round(Math.random()) // 0 = no instructions and 1 = given fake/staged instructions
 console.log(instructVersion)
 
-var subject_id = jsPsych.randomization.randomID(5) // generate a random subject ID with 5 characters
+let subject_id = jsPsych.randomization.randomID(5) // generate a random subject ID with 5 characters
 
-var resultsID = 0
+let resultsID = 0
 
-var winWidth = 800 //800
+let winWidth = 800 //800
 
-var actualLagTypes = [2, 4] //Actually only lag 2 [Steve: change this later]
+let actualLagTypes = [2, 4] //Actually only lag 2 [Steve: change this later]
 
-var focusCheckInterval = 1000
+let focusCheckInterval = 1000
 
-var itemsPerStream = 16
+let itemsPerStream = 16
 
-var earliestDistractPosition = 2 // Arrays are zero-indexed, so these are the 3rd and 10th positions - BECAUSE WE ARE ONLY DOING LAG 2! Reduce last position if including longer lags
-var latestDistractPosition = 9
+let earliestDistractPosition = 2 // Arrays are zero-indexed, so these are the 3rd and 10th positions - BECAUSE WE ARE ONLY DOING LAG 2! Reduce last position if including longer lags
+let latestDistractPosition = 9
 
 // This next bit gets the results ID, which will be passed in the parameters in the URL
 // It uses code from https://www.xul.fr/javascript/parameters.php
 if (location.search.substring(1)) {
   //USEFUL_BIT
-  var parameters = location.search.substring(1).split('&') //USEFUL_BIT
-  var temp = parameters[0].split('=') //USEFUL_BIT
+  let parameters = location.search.substring(1).split('&') //USEFUL_BIT
+  let temp = parameters[0].split('=') //USEFUL_BIT
   if (temp[1]) {
     resultsID = unescape(temp[1])
   } //USEFUL_BIT
 } //USEFUL_BIT
 
-var numBlocksTotal = 2 //in this experiment we only want to show the 28 neg + 28 neutral pics once so we only have two blocks (normally you'd have more).
-var quitButtonCount = 0 // in this variation of the task, if the pp pushes q a anytime it will skip to the debrief.
-var quitPlease
+let numBlocksTotal = 2 //in this experiment we only want to show the 28 neg + 28 neutral pics once so we only have two blocks (normally you'd have more).
+let quitButtonCount = 0 // in this variation of the task, if the pp pushes q a anytime it will skip to the debrief.
+let quitPlease
 
-if (realVersion) {
-  var trialsPerDistractCond = 14 //PerBlock How many trials per condition (14 x neut/14 x negative) x 2 blocks [STEVE: CHANGE THIS IF WE ARE GOING TO CHANGE NUMBER OF STIMULI PER CONDITION]
-  var numDistractConditions = 2 // neut and negative in this experiment.
-  var trialsPerBaselineType = 7 // PerBlock How many baseline trials
-  var initialPauseDuration = 1000 // 1000
-  var itiDuration = 500 // 500
-  var fixationDuration = 500 // 500
-  var feedbackDuration = 1000 // 900
+let pracStdDur = []
+let pracDisDur = []
 
-  var finalStandardDuration = 100 // 100
-  var finalDistractDuration = 100 // 100
+let numPracticeTrials = pracDurSteps.length * pracNperstep
+let numPracticeTrialsDigits = 6
 
-  var pracDurSteps = [500, 250, 150, 100, finalStandardDuration] //   [500, 250, 150, 100, finalStandardDuration]
-  var pracNperstep = 2
+let tempCounter = 0
 
-  var firstPracTrialDur = 750 // 750
-  var numMemBlocks = 4 // how many blocks should we split mem trials (with breaks) into. Note that mem trials should be divisable by 4!
-  var numMemPics = 28 //This is number of mem trials for each negative/neutral condition (not foils).
-  var numFoilPics = 9 //This is per emotion condition - so 9 negative + 9 neutral pics left over to act as foils in the memory task [STEVE: CHANGE THIS AS APPROPRIATE FOR MEMORY TEST]
-  var memConditionsTotal = 4 //1 = neg old 2 =  neg_foils, 3 = neut old, 4 = neut foils.
-} else {
-  var trialsPerDistractCond = 4 //PerBlock How many trials per condition (neut/negative)
-  var numDistractConditions = 2 // neut and negative in this experiment
-  var trialsPerBaselineType = 2 // PerBlock How many baseline trials
-  var initialPauseDuration = 100 // 1000
-  var itiDuration = 500 // 500
-  var fixationDuration = 500 // 500
-  var feedbackDuration = 800 // 900
-
-  var finalStandardDuration = 100 // 100
-  var finalDistractDuration = 100 // 100
-
-  var pracDurSteps = [500, 250, 150, 100, finalStandardDuration] // [10, 10, 10, 10, 10]    [500, 250, 150, 100, finalStandardDuration]
-  var pracNperstep = 1
-
-  var firstPracTrialDur = 750 // 750
-  var numMemBlocks = 4 // how many blocks should we split mem trials (with breaks) into. Note that mem trials should be divisable by 4!
-  var numMemPics = 8 //so 8 each of neg/neutral x old/new
-  var numFoilPics = 8 // use 24 negative and 24 neutral pics as foils
-  var memConditionsTotal = 4 //1 = neg old 2 =  neg_foils, 3 = neut old, 4 = neut foils.
-}
-
-var pracStdDur = []
-var pracDisDur = []
-
-var numPracticeTrials = pracDurSteps.length * pracNperstep
-var numPracticeTrialsDigits = 6
-
-var tempCounter = 0
-
-for (ii = 0; ii < pracDurSteps.length; ii++) {
-  for (jj = 0; jj < pracNperstep; jj++) {
-    pracStdDur[tempCounter] = pracDurSteps[ii]
-    pracDisDur[tempCounter] = pracDurSteps[ii]
-    if (ii == pracDurSteps.length - 1) {
+for (let i = 0; i< pracDurSteps.length; i++) {
+  for (let j = 0; j < pracNperstep; j++) {
+    pracStdDur[tempCounter] = pracDurSteps[i]
+    pracDisDur[tempCounter] = pracDurSteps[i]
+    if (i== pracDurSteps.length - 1) {
       pracDisDur[tempCounter] = finalDistractDuration
     }
     tempCounter++
@@ -119,89 +108,43 @@ for (ii = 0; ii < pracDurSteps.length; ii++) {
 }
 
 // ******************* COLLATE FILENAMES FOR PRELOADING ******************
-var numStandardImages = 251
-var numTargetImages = 120 // 120 images, each in left and right configurations
-var numNegImages = 37
+let numStandardImages = 251
+let numTargetImages = 120 // 120 images, each in left and right configurations
+let numNegImages = 37
 //  28 will be used for the RSVP task and 9 will be used as foils in the memory task, an additional 2 will be shown at beginning with ethics,
-var numNeutImages = 37 //  24 will be used for the RSVP task and 12 will be used as foils in the memory task,
+let numNeutImages = 37 //  24 will be used for the RSVP task and 12 will be used as foils in the memory task,
 
-var typeOfBlock = ''
-
-var imageFilenames = []
-
-var previewNegFilenames = []
-for (ii = 0; ii < 4; ii++) {
-  previewNegFilenames[ii] = 'images/distractors/Samples/sample_' + ii + '.jpg'
-}
-imageFilenames = imageFilenames.concat(previewNegFilenames)
-console.log(previewNegFilenames)
-
-var negFilenames = [] //[STEVE: CHANGE TO POSFILENAMES AS APPROPRIATE FOR KAREN, THROUGHOUT SCRIPT]
-for (ii = 0; ii < numNegImages; ii++) {
-  negFilenames[ii] = 'images/distractors/Negative/neg_' + ii + '.jpg'
-}
-imageFilenames = imageFilenames.concat(negFilenames)
-
-var neutFilenames = []
-for (ii = 0; ii < numNeutImages; ii++) {
-  neutFilenames[ii] = 'images/distractors/Neutral/neut_' + ii + '.jpg'
-}
-imageFilenames = imageFilenames.concat(neutFilenames)
-
-var standardFilenames = []
-for (ii = 0; ii < numStandardImages; ii++) {
-  standardFilenames[ii] = 'images/standards/standard' + ii + '.jpg'
-}
-imageFilenames = imageFilenames.concat(standardFilenames)
-
-var target0Filenames = []
-for (ii = 0; ii < numTargetImages; ii++) {
-  target0Filenames[ii] = 'images/targets/target' + ii + '_0.jpg'
-}
-imageFilenames = imageFilenames.concat(target0Filenames)
-
-var target1Filenames = []
-for (ii = 0; ii < numTargetImages; ii++) {
-  target1Filenames[ii] = 'images/targets/target' + ii + '_1.jpg'
-}
-imageFilenames = imageFilenames.concat(target1Filenames)
-
-imageFilenames = imageFilenames.concat('images/target_example_white.jpg')
-
-console.log(imageFilenames)
+let typeOfBlock = ''
 
 // ******************* CREATE AND SET VARIOUS USEFUL VARIABLES ******************
 
-var trialDistractType = 3 //  Initialize as 3 so that all practice trials recorded as baseline type.
-var trialDistractPos
-var trialLag
-var trialStandardDuration
-var trialDistractDuration
+let trialDistractType = 3 //  Initialize as 3 so that all practice trials recorded as baseline type.
+let trialDistractPos
+let trialLag
+let trialStandardDuration
+let trialDistractDuration
 
-var fbStrCorrect = 'correct'
-var fbStrIncorrect = 'incorrect'
-var trialCorrect = 0 //RSVP correct
+let fbStrCorrect = 'correct'
+let fbStrIncorrect = 'incorrect'
+let trialCorrect = 0 //RSVP correct
+let stimArray = []
 
-var stimArray = []
+let distractID = 'none' // Initialize as 'none' so that it records no distractor during practice
+let targetID = ''
 
-var distractID = 'none' // Initialize as 'none' so that it records no distractor during practice
-var targetID = ''
+let exptPhase = 0 // 0 = practice, 1 = ACTUAL; 2 = Memory
+let blockNum = 0
+let trialNum = 0
+let trialNumInBlock = 0
 
-var exptPhase = 0 // 0 = practice, 1 = ACTUAL; 2 = Memory
-var blockNum = 0
-var trialNum = 0
-var trialNumInBlock = 0
-
-var p_age = ''
-var p_gender = ''
-var p_language = ''
-var p_country = ''
+let p_language = ''
+let p_country = ''
 
 // fixation
 
-var runFixation = {
-  type: 'image-keyboard-response',
-  stimulus: 'images/fixation.png',
+let runFixation = {
+  type: 'html-keyboard-response',
+  stimulus: '<span style="font-size:60px;">+</span>',
   trial_duration: fixationDuration,
   response_ends_trial: false
 }
@@ -210,71 +153,74 @@ var runFixation = {
 
 // ******************* SET TRIAL TYPES RSVP******************
 
-lagType = 2 //it's always 2 in this experiment
+const lagType = 2 //it's always 2 in this experiment
 
 // first let's split our negative and neutral distractor pics into two different piles (24 to be used in RSVP and 12 to be used later in the memory task).
 // We want to make sure we have just the right amount of pics in these arrays (then we can sample without replacement and know that they will all be seen).
 // first we calculate how many trials we need of each condition for the distractorID selection (which should be 12 trials per distractor condition, per block for the two distractor conditions).
-var numTrialsPerBlock =
+let numTrialsPerBlock =
   trialsPerDistractCond * numDistractConditions + trialsPerBaselineType // 12 x 2 = 24 + 6 in this experiment
 
 //then we calculate how many pics we need to have in each of the two piles. We'll then copy them from the (shuffled) pic arrays.
 
-var maxPicsPerRSVPcond = trialsPerDistractCond * numBlocksTotal //12 x 2 = 24 pics per pile
+let maxPicsPerRSVPcond = trialsPerDistractCond * numBlocksTotal //12 x 2 = 24 pics per pile
 
-shuffleArray(negFilenames)
-shuffleArray(neutFilenames)
+// shuffleArray(positiveImageFilePaths)
+// shuffleArray(neutralImageFilePaths)
+shuffleArray(positiveImageFilePaths)
+shuffleArray(neutralImageFilePaths)
 
 //console.log(negFilenames);
 
-var neg = []
-var neut = []
-var neg_foil = []
-var neut_foil = []
+let neg = []
+let neut = []
+let neg_foil = []
+let neut_foil = []
 
-for (ii = 0; ii < maxPicsPerRSVPcond; ii++) {
+for (let i= 0; i< maxPicsPerRSVPcond; i++) {
   //copy the first 24 pics to the 0-23 slots of the relevant arrays
-  neg[ii] = negFilenames[ii]
-  neut[ii] = neutFilenames[ii]
+  neg[i] = positiveImageFilePaths[i]
+  neut[i] = neutralImageFilePaths[i]
 }
 
-for (kk = 0; kk < numFoilPics; kk++) {
+for (let i = 0; i < numFoilPics; i++) {
   //copy the next 12 pics to the foil arrays
-  neg_foil[kk] = negFilenames[kk + maxPicsPerRSVPcond]
-  neut_foil[kk] = neutFilenames[kk + maxPicsPerRSVPcond]
+  neg_foil[i] = positiveImageFilePaths[i + maxPicsPerRSVPcond]
+  neut_foil[i] = neutralImageFilePaths[i + maxPicsPerRSVPcond]
 }
 
 //unfortunately if we want to have break blocks during memory task we are going to need to have counters for all of these stim arrays
-var negcounter = 0
-var neutcounter = 0
-var neg_foilcounter = 0
-var neut_foilcounter = 0
+let negcounter = 0
+let neutcounter = 0
+let neg_foilcounter = 0
+let neut_foilcounter = 0
 
 // now let's make an array of ones, twos and threes which is used to select the trialtype on each RSVP trial (shuffled before each block)
-var trialSelector = []
-for (ii = 0; ii < trialsPerDistractCond; ii++) {
-  trialSelector[ii] = 1
+let trialSelector = []
+for (let i= 0; i< trialsPerDistractCond; i++) {
+  trialSelector[i] = 1
 }
-for (ii = trialsPerDistractCond; ii < trialsPerDistractCond * 2; ii++) {
-  trialSelector[ii] = 2
+for (let i = trialsPerDistractCond; i < trialsPerDistractCond * 2; i++) {
+  trialSelector[i] = 2
 }
-for (ii = trialsPerDistractCond * 2; ii < numTrialsPerBlock; ii++) {
-  trialSelector[ii] = 3
+for (let i = trialsPerDistractCond * 2; i < numTrialsPerBlock; i++) {
+  trialSelector[i] = 3
 }
 
 shuffleArray(trialSelector)
 
-var last_rsvp_time = 0
+let last_rsvp_time = 0
 
-var runRSVPtrial = {
+let runRSVPtrial = {
   type: 'rsvp-sequence',
+  trial_target_type: Math.floor(Math.random() * 2),
   stimuli: function () {
     shuffleArray(standardFilenames)
 
-    var stimArray = []
-    for (ii = 0; ii < itemsPerStream + 2; ii++) {
+    let stimArray = []
+    for (let i = 0; i < itemsPerStream + 2; i++) {
       // Extra 2 elements in array hold distractor and target stimuli; these will be moved into position later
-      stimArray[ii] = standardFilenames[ii]
+      stimArray[i] = standardFilenames[i]
     }
 
     trialDistractType = trialSelector[trialNumInBlock] // so 1 = negative, 2 = neutral, 3 = baseline.
@@ -291,8 +237,14 @@ var runRSVPtrial = {
 
     stimArray[itemsPerStream] = distractID
 
-    trialTargetType = Math.floor(Math.random() * 2)
-    if (trialTargetType == 0) {
+    window.trialTargetType = Math.floor(Math.random() * 2)
+    if (window.trialTargetType == 0) {
+      targetID = sampleArray(target0Filenames)
+    } else {
+      targetID = sampleArray(target1Filenames)
+    }
+
+    if (this.trial_target_type == 0) {
       targetID = sampleArray(target0Filenames)
     } else {
       targetID = sampleArray(target1Filenames)
@@ -320,16 +272,16 @@ var runRSVPtrial = {
 }
 
 //here we add 81 (q) as keycode in case they want to quit.
-var correctKeyCode
+let correctKeyCode
 
-var runRSVPresponse = {
+let runRSVPresponse = {
   type: 'categorize-image',
   stimulus: 'images/response_prompt.png',
   choices: [37, 39, 81],
 
   key_answer: function () {
     correctKeyCode = 37
-    if (trialTargetType == 1) {
+    if (window.trialTargetType == 1) {
       correctKeyCode = 39
     }
     return correctKeyCode
@@ -348,14 +300,14 @@ var runRSVPresponse = {
   post_trial_gap: itiDuration,
 
   on_finish: function (trial_data) {
-    RSVPresp = trial_data.key_press
+    window.RSVPresp = trial_data.key_press
     if (trial_data.key_press == 81) {
       quitButtonCount = 1
       quitPlease = true
       console.log(quitButtonCount)
-    } else if (trial_data.key_press == 39 && trialTargetType == 1) {
+    } else if (trial_data.key_press == 39 && window.trialTargetType == 1) {
       trialCorrect = 1
-    } else if (trial_data.key_press == 37 && trialTargetType == 0) {
+    } else if (trial_data.key_press == 37 && window.trialTargetType == 0) {
       trialCorrect = 1
     } else {
       trialCorrect = 0
@@ -369,9 +321,9 @@ var runRSVPresponse = {
       trialDistractType: trialDistractType,
       trialDistractPos: trialDistractPos,
       trialLag: trialLag,
-      RSVPtrialResp: RSVPresp,
+      RSVPtrialResp: window.RSVPresp,
       RSVPTrialCorrect: trialCorrect,
-      trialTargetType: trialTargetType,
+      trialTargetType: window.trialTargetType,
       distractID: distractID,
       targetID: targetID,
       rsvp_time: last_rsvp_time
@@ -379,16 +331,16 @@ var runRSVPresponse = {
   }
 }
 
-var runRSVPtrialPractice = {
+let runRSVPtrialPractice = {
   type: 'rsvp-sequence',
   stimuli: function () {
     shuffleArray(standardFilenames)
     stimArray = []
-    for (ii = 0; ii < itemsPerStream + 2; ii++) {
+    for (let i = 0; i < itemsPerStream + 2; i++) {
       // Extra 2 elements in array hold distractor and target stimuli; these will be moved into position later
-      stimArray[ii] = standardFilenames[ii]
+      stimArray[i] = standardFilenames[i]
     }
-    trialTargetType = Math.floor(Math.random() * 2)
+    let trialTargetType = Math.floor(Math.random() * 2)
     if (trialTargetType == 0) {
       targetID = sampleArray(target0Filenames)
     } else {
@@ -413,14 +365,14 @@ var runRSVPtrialPractice = {
   lag_type: 2
 }
 
-var runRSVPresponsePractice = {
+let runRSVPresponsePractice = {
   type: 'categorize-image',
   stimulus: 'images/response_prompt_noQuit.png',
   choices: [37, 39],
 
   key_answer: function () {
     correctKeyCode = 37
-    if (trialTargetType == 1) {
+    if (window.trialTargetType == 1) {
       correctKeyCode = 39
     }
     return correctKeyCode
@@ -439,10 +391,10 @@ var runRSVPresponsePractice = {
   post_trial_gap: itiDuration,
 
   on_finish: function (trial_data) {
-    RSVPresp = trial_data.key_press
-    if (trial_data.key_press == 39 && trialTargetType == 1) {
+    window.RSVPresp = trial_data.key_press
+    if (trial_data.key_press == 39 && window.trialTargetType == 1) {
       trialCorrect = 1
-    } else if (trial_data.key_press == 37 && trialTargetType == 0) {
+    } else if (trial_data.key_press == 37 && window.trialTargetType == 0) {
       trialCorrect = 1
     } else {
       trialCorrect = 0
@@ -456,9 +408,9 @@ var runRSVPresponsePractice = {
       trialDistractType: trialDistractType,
       trialDistractPos: trialDistractPos,
       trialLag: trialLag,
-      RSVPtrialResp: RSVPresp,
+      RSVPtrialResp: window.RSVPresp,
       RSVPTrialCorrect: trialCorrect,
-      trialTargetType: trialTargetType,
+      trialTargetType: window.trialTargetType,
       distractID: distractID,
       targetID: targetID,
       rsvp_time: last_rsvp_time
@@ -468,12 +420,12 @@ var runRSVPresponsePractice = {
 
 // ******************* INITIAL INSTRUCTIONS ******************
 
-var tempInstrStr =
+let tempInstrStr =
   '<p style="text-align:left">Thanks for agreeing to take part in this study!<br><br>In this study, you will be asked to complete a <b>target detection</b> task.<br><br>Each trial will start with a cross appearing - this tells you that the trial is about to begin. You will then see a stream of pictures flash up rapidly in the center of the screen, one after another.<br><br></p>'
 
-var target_example =
+let target_example =
   '<p style="text-align:center"><img src="images/target_example_white.jpg" /><br></p>'
-var initial_instructions = {
+let initial_instructions = {
   type: 'instructions',
   pages: [
     tempInstrStr,
@@ -486,9 +438,9 @@ var initial_instructions = {
   post_trial_gap: 0
 }
 
-var initial_Q0_answers
-var initial_Q1_answers
-var initial_Q2_answers
+let initial_Q0_answers
+let initial_Q1_answers
+let initial_Q2_answers
 
 initial_Q0_answers = [
   ' A picture of a tree.',
@@ -504,7 +456,7 @@ initial_Q2_answers = [
   ' At the end of the stream of pictures.'
 ]
 
-var initial_correctstring =
+let initial_correctstring =
   '{"Q0":"' +
   initial_Q0_answers[1] +
   '","Q1":"' +
@@ -513,9 +465,9 @@ var initial_correctstring =
   initial_Q2_answers[1] +
   '"}'
 
-var initial_repeatInstructions = true
+let initial_repeatInstructions = true
 
-var initial_instruction_check = {
+let initial_instruction_check = {
   type: 'survey-multi-choice',
   preamble: [
     "<p style='text-align:center;'><b>Check your knowledge before you continue!</b></p>"
@@ -550,7 +502,7 @@ var initial_instruction_check = {
   }
 }
 
-var initial_check_failed_display = {
+let initial_check_failed_display = {
   type: 'html-button-response',
   stimulus:
     '<p><b>Unfortunately, at least one of your answers was incorrect.</b></p>',
@@ -560,14 +512,14 @@ var initial_check_failed_display = {
   post_trial_gap: 100
 }
 
-var initial_check_failed_conditional = {
+let initial_check_failed_conditional = {
   timeline: [initial_check_failed_display],
   conditional_function: function () {
     return initial_repeatInstructions // If this is true, it will execute timeline (show failure screen)
   }
 }
 
-var loop_initial_instructions = {
+let loop_initial_instructions = {
   timeline: [
     initial_instructions,
     initial_instruction_check,
@@ -580,20 +532,20 @@ var loop_initial_instructions = {
 
 // ******************* FIRST PRACTICE TRIAL ******************
 
-var ready_to_start_practice = {
+let ready_to_start_practice = {
   type: 'html-keyboard-response',
   stimulus:
     "<p><b>Well done - all your answers were correct!</b></p><p>You'll now have a chance to practice the task. We'll go through the first trial very slowly.</p><p style='font-size:90%;'><br>Press any key to continue</p>"
 }
 
-var firstRSVPtrialPractice = {
+let firstRSVPtrialPractice = {
   type: 'rsvp-sequence',
   stimuli: function () {
     shuffleArray(standardFilenames)
     stimArray = []
-    for (ii = 0; ii < 5; ii++) {
+    for (let i = 0; i < 5; i++) {
       // All elements hold standard stimuli
-      stimArray[ii] = standardFilenames[ii]
+      stimArray[i] = standardFilenames[i]
     }
     return stimArray
   },
@@ -603,15 +555,15 @@ var firstRSVPtrialPractice = {
   lag_type: 2
 }
 
-var firstRSVPtrialTarget = {
+let firstRSVPtrialTarget = {
   type: 'html-keyboard-response',
   stimulus:
     '<p style="color:black">This is the TARGET picture. On this trial, it is rotated to the right.<br>So at the end of the stream of pictures, you should press the <b>right arrow key</b>.<br><br>Press any key to continue with the stream.</p><p><img src="images/targets/target0_1.jpg"></img></p><p>This is the TARGET picture. On this trial, it is rotated to the right.<br>So at the end of the stream of pictures, you should press the <b>right arrow key</b>.<br><br>Press any key to continue with the stream.</p>', // The white bit at the start of this line is just so the image appears in the centre of the screen
   post_trial_gap: 100
 }
 
-var firstPracCorrect = false
-var firstRSVPtrialresponse = {
+let firstPracCorrect = false
+let firstRSVPtrialresponse = {
   type: 'html-keyboard-response',
   stimulus:
     '<p style="color:black">You should now make your response to the target that you saw earlier.<br><br>On this trial, the target was rotated to the right so you should<br>press the right arrow key on the keyboard now.</p><p><img src="images/response_prompt_noQuit.png"></img></p><p>You should now make your response to the target that you saw earlier.<br><br>On this trial, the target was rotated to the right so you should<br>press the right arrow key now.</p>', // The white bit at the start of this line is just so the image appears in the centre of the screen
@@ -626,9 +578,9 @@ var firstRSVPtrialresponse = {
     })
   }
 }
-style = 'color:#FF0000'
+const style = 'color:#FF0000'
 
-var firstRSVPtrialFB = {
+let firstRSVPtrialFB = {
   type: 'html-keyboard-response',
   stimulus: function () {
     if (firstPracCorrect) {
@@ -647,7 +599,7 @@ var firstRSVPtrialFB = {
   response_ends_trial: false
 }
 
-var first_practice_trial_loop = {
+let first_practice_trial_loop = {
   timeline: [
     runFixation,
     firstRSVPtrialPractice,
@@ -661,7 +613,7 @@ var first_practice_trial_loop = {
   }
 }
 
-var instr_before_prac_loop = {
+let instr_before_prac_loop = {
   type: 'html-keyboard-response',
   stimulus: function () {
     typeOfBlock = 'Prac'
@@ -669,7 +621,7 @@ var instr_before_prac_loop = {
   }
 }
 
-var loop_practice_trials = {
+let loop_practice_trials = {
   timeline: [runFixation, runRSVPtrialPractice, runRSVPresponsePractice],
 
   loop_function: function () {
@@ -684,12 +636,12 @@ var loop_practice_trials = {
   }
 }
 
-var nextBlock = {
+let nextBlock = {
   type: 'html-keyboard-response',
   stimulus: function () {
     typeOfBlock = 'EIB'
-    var tempTextHTML = ' '
-    var reminderText = ' '
+    let tempTextHTML = ' '
+    let reminderText = ' '
     if (instructVersion == 0)
       reminderText =
         "<p>Don't forget that the rotated target will never be of a person so you can ignore those images.</p>" //[STEVE: DON'T NEED INSTRUCTVERSION B/C EVERYONE GETS SAME INSTRUCTIONS]
@@ -716,7 +668,7 @@ var nextBlock = {
   post_trial_gap: initialPauseDuration
 }
 
-var nextBlockMemory = {
+let nextBlockMemory = {
   type: 'html-keyboard-response',
   stimulus:
     "<p>You're finished with the rotation task. <br><br> Now you will complete a slightly different task. <br><br> On each trial you will be shown an image for 3 seconds. <br><br> Please indicate within 3 seconds whether or not you have seen the image in the previous task by pressing the LEFT arrow key (<) if you have seen the image before or the RIGHT arrow key (>) if you have not seen the image before.<br><br>Press any key to begin</p>",
@@ -726,7 +678,7 @@ var nextBlockMemory = {
   }
 }
 
-var if_node_nextBlockMemory = {
+let if_node_nextBlockMemory = {
   timeline: [nextBlockMemory],
   conditional_function: function () {
     if (quitButtonCount == 1) {
@@ -737,27 +689,27 @@ var if_node_nextBlockMemory = {
 }
 
 //#####Memory Task#########
-var memBlockNum = 0
-var numTrialsPerMemBlock = (numMemPics * 2 + numFoilPics * 2) / numMemBlocks
-var memTrialSelector = []
+let memBlockNum = 0
+let numTrialsPerMemBlock = (numMemPics * 2 + numFoilPics * 2) / numMemBlocks
+let memTrialSelector = []
 
 //need to have 28 of condition 1 (neg), 9 of condition 2 (neg foil), 28 of condition 3 (neutral) and 9 of condition 4 (neutral foils).
 // now let's make an array of ones up to fours. This is clunky but nested for-loops suck in javascript
-for (ii = 0; ii < numMemPics; ii++) {
-  memTrialSelector[ii] = 1
+for (let i = 0; i < numMemPics; i++) {
+  memTrialSelector[i] = 1
 } //up to 28
-for (ii = numMemPics; ii < numMemPics + numFoilPics; ii++) {
-  memTrialSelector[ii] = 2
+for (let i = numMemPics; i < numMemPics + numFoilPics; i++) {
+  memTrialSelector[i] = 2
 } // up to 37
-for (ii = numMemPics + numFoilPics; ii < numMemPics * 2 + numFoilPics; ii++) {
-  memTrialSelector[ii] = 3
+for (let i = numMemPics + numFoilPics; i < numMemPics * 2 + numFoilPics; i++) {
+  memTrialSelector[i] = 3
 } // up to 65
 for (
-  ii = numMemPics * 2 + numFoilPics;
-  ii < numMemPics * 2 + numFoilPics * 2;
-  ii++
+  let i = numMemPics * 2 + numFoilPics;
+  i < numMemPics * 2 + numFoilPics * 2;
+  i++
 ) {
-  memTrialSelector[ii] = 4
+  memTrialSelector[i] = 4
 } //up to 74
 
 console.log(memTrialSelector)
@@ -767,16 +719,16 @@ shuffleArray(memTrialSelector)
 shuffleArray(neg)
 shuffleArray(neut)
 
-var memTrialCounter = 0 // this counter does not get reset
+let memTrialCounter = 0 // this counter does not get reset
 
-var PressSpacebartrial = {
+let PressSpacebartrial = {
   type: 'html-keyboard-response',
   choices: [' '],
   stimulus:
     '<p> When you are ready: push spacebar to view the next image.</p><p> It will only show for one second</p>'
 }
 
-var memoryTaskTrials = {
+let memoryTaskTrials = {
   type: 'categorize-image',
   prompt:
     '<br><br> Did you see this picture within the rapidly flashed images in the first part of the experiment? <br><br> < Yes                             No >' +
@@ -848,10 +800,10 @@ var memoryTaskTrials = {
   }
 }
 
-var memBlockBreak = {
+let memBlockBreak = {
   type: 'html-keyboard-response',
   stimulus: function () {
-    var tempTextHTML =
+    let tempTextHTML =
       "<p>You're doing well!</p><p>" +
       (memBlockNum + 1) +
       ' of ' +
@@ -868,264 +820,45 @@ var memBlockBreak = {
 // ETHICS ETC
 
 // ******************* WELCOME AND DEMOGRAPHICS ******************
-var smallFontSize = '90%'
-var mWidth = '16px 80px'
+let smallFontSize = '90%'
+let mWidth = '16px 80px'
 
 // ETHICS ETC
 
-// ******************* WELCOME AND CONSENT ******************
-
-/* define welcome message trial */
-var welcome = {
-  type: 'html-keyboard-response',
-  stimulus: 'Welcome to the experiment. Press any key to begin.'
-}
-
-welcome.task = {}
-welcome.task.blurb =
-  '<b>"Rapid Search & Appraisal"</b> is a psychological study investigating how people process rapidly presented images, including unpleasant ones. To participate you will need to be using a computer (with keyboard and mouse/trackpad).'
-
-var welcome1 = {
-  type: 'html-button-response',
-  stimulus: function () {
-    return (
-      '<h1 style="text-align:center;">UNSW Sydney</h1>' +
-      '    <p style="text-align:left;line-height:190%;margin:' +
-      mWidth +
-      ';"><br>Thank you for applying to participate in this study. ' +
-      welcome.task.blurb +
-      ' It involves the following steps:</p>' +
-      '<ol style="text-align:left;line-height:190%;margin:' +
-      mWidth +
-      ';">' +
-      '<li>  We ask for your informed consent. Please read the consent form closely. <br></li>' +
-      '<li>  We will then explain how to do the task in detail. <br></li>' +
-      '<li>  Next comes the experiment itself. <br></li>' +
-      '<li>  Finally you will be asked some questions.<br></li>' +
-      '</ol>' +
-      '<p style="text-align:left;line-height:190%;margin:' +
-      mWidth +
-      ';">Please <u>do not</u> use the "back" ' +
-      '   button on your browser or close the window until you reach the end of the experiment.' +
-      '   This is very likely to break the experiment.' +
-      '   However, if something does go wrong, please contact us! When you are ready to begin, click on' +
-      '   the "START" button below.<br><br></p>'
-    )
-  },
-  choices: ['<p style="font-size:130%;line-height:0%;"><b>START!</b></p>']
-}
-
-welcome.ethics = {}
-welcome.ethics.selection =
-  'You are invited to take part in this research study. The research study aims to investigate how people process rapidly presented images, including unpleasant ones. You have been invited because you are a student taking introductory psychology at UNSW.'
-welcome.ethics.description =
-  'If you decide to take part in the research study, you will be asked to view rapid streams of mostly landscape or architectural images. One of these images will be rotated 90 degrees, and your goal will be to identify whether this image was rotated left or right. There will also be some images of people, some of which will be unpleasantly graphic or violent (e.g., depictions of injury, disfigurement, or death; you will have a chance to view samples prior to' +
-  'beginning the experiment and may withdraw at any time). These images will be presented rapidly, at a rate of 10 per second, but you will see them again for a longer duration at the end of the experiment. You will also be asked questions about your emotional style. We don’t expect this research to cause any harm. However, you may skip any or all written or verbal questions if you wish. Please var the researchers know if you need any assistance for any reason.'
-
-var welcome2 = {
-  type: 'html-button-response',
-  stimulus:
-    '<p style="text-align:right;font-size:' +
-    smallFontSize +
-    ';margin:' +
-    mWidth +
-    ';margin-top:30px;">Approval No 3670</p>' +
-    '		<p style="text-align:center;"><b>THE UNIVERSITY OF NEW SOUTH WALES<br>' +
-    '			PARTICIPANT INFORMATION STATEMENT</b><br><br><b>Rapid Search & Appraisal</b><br></p>' +
-    '			<p style="text-align:left;line-height:120%;font-size:' +
-    smallFontSize +
-    ';margin:' +
-    mWidth +
-    ';">' +
-    '			<b>1. What is the research study about?</b><br>' +
-    '		You are invited to take part in this research study. The research study investigates how people process rapidly presented images, including unpleasant ones. You have been invited because you are a registered user of Prolific.<br><br>' +
-    '			<b>2. Who is conducting this research? </b><br>' +
-    '		The study is being carried out by the following researchers: Associate Professor Steven B. Most and Rayan Premaratna, UNSW Sydney School of Psychology.<br>' +
-    '		Research Funder: This research is not funded by any outside agency. <br><br>' +
-    '			<b>3. Inclusion/Exclusion Criteria </b><br>' +
-    '		Before you decide to participate in this research study, you should meet the following criteria:<br>' +
-    '			<ul style="text-align:left;line-height:120%;font-size:' +
-    smallFontSize +
-    '; margin:' +
-    mWidth +
-    ';">' +
-    '			<li>You have normal or corrected to normal, vision</li>' +
-    '      <li>Please do NOT participate if you are likely to be upset by graphic or gory images</li>' +
-    '			</ul>' +
-    '			<p style="text-align:left;line-height:120%;font-size:' +
-    smallFontSize +
-    ';margin:' +
-    mWidth +
-    ';">' +
-    '			<b>4. Do I have to take part in this research study?</b><br>' +
-    '		Participation in this research study is voluntary. If you do not want to take part, you do not have to. If you decide to take part and later change your mind, you are free to withdraw from the study at any stage (See Item 11).' +
-    '			<p style="text-align:left;line-height:120%;font-size:' +
-    smallFontSize +
-    ';margin:' +
-    mWidth +
-    ';">' +
-    '			<b>5. What does participation in this research require, and are there any risks involved?</b><br>' +
-    '		If you decide to take part in the research study, we will ask you to view rapid streams of mostly landscape or architectural images.' +
-    ' One of these images will be rotated 90 degrees, and your goal will be to identify whether this image was rotated left or right. There will also be some images of people, some of which will be unpleasantly graphic or violent (e.g., depictions of injury, disfigurement, or death; you will have a chance to view samples prior to beginning the experiment and may withdraw at any time).' +
-    ' These images will be presented rapidly, at a rate of 10 per second, but you will see them again for a longer duration at the end of the experiment. You will also be asked questions about your emotional style.<br><br>' +
-    '	We don’t expect this research to cause any harm. However, if you do not wish to answer a question, you may skip it and go to the next question, or you may stop immediately. If you become upset or distressed by this research project, free contactable support services are included at section 12. These services are provided by qualified staff who are not members of the research team. Please var the researchers know if you need any assistance for any reason. <br><br>' +
-    '	<b>6. Total participation time </b><br>' +
-    '		In total, participation in this study will require 30 minutes. <br><br>' +
-    '	<b>7. Recompense to participants </b><br>' +
-    '		You will be compensated at a rate of GBP £12/hr for your participation. As this experiment should be completed within 30 minutes, you will receive GBP £6. <br><br>' +
-    '	<b>8. What are the possible benefits to participation?</b><br>' +
-    '		We cannot promise that you will receive any benefits from this study, but we hope to use the findings from this study to build upon research about the impact of emotional stimuli on perception and cognition. <br><br>' +
-    '	<b>9. What will happen to information about me?</b><br>' +
-    "		The information that you provide us will be kept indefinitely after the project’s completion.  We will store information about you in a non-identifiable format on a password-protected server at UNSW's School of Psychology (Kensington Campus) Non-identifiable data from the experiment may also be placed in a publically accessible repository. <br><br>" +
-    '		Researchers at UNSW are requested to store their aggregated research data in the UNSW data repository, this is a system called ResData. Once the aggregated data are deposited into this repository, they will be retained in this system permanently, but in a format where your data will not be individually identifiable.<br><br>' +
-    '		Your information will be used for an honours thesis paper. The data may also be reported at professional conferences and journal articles. However, in all cases, data will be de-identified and reported in aggregate form. <br><br>' +
-    '	<b>10. How and when will I find out what the results of the research study are?</b><br>' +
-    '		The research team intend to publish and/ report the results of the research study in a variety of ways. All information published will be done in a way that will not identify you. If you would like to receive a copy of the results you can var the research team know by contacting lead investigator A/Prof Steven Most at s.most@unsw.edu.au <br><br>' +
-    '	<b>11. What if I want to withdraw from the research study?</b><br>' +
-    '		If you do consent to participate, you may withdraw at any time. If you withdraw before starting the experiment, you can do this by closing the browser window. If you withdraw in the middle of the experiment, you can do so by clicking on a Quit button that will be visible. If you withdraw from the research, we will destroy any information that has already been collected. Once you have completed the experiment, however, we will not be able to withdraw your responses as the questionnaire is anonymous. <br><br>' +
-    '		Your decision not to participate or to withdraw from the study will not affect your relationship with UNSW. If you decide to withdraw from the research study, the researchers will not collect additional information from you. Any identifiable information about you will be withdrawn from the research project. <br><br>' +
-    '	<b>12. What should I do if I have further questions about my involvement in the study? </b><br>' +
-    '		If you require further information regarding this study or if you have any problems that may be related to your involvement in the study, you can contact the following member/s of the research team:' +
-    '			<ul style="text-align:left;line-height:120%;font-size:' +
-    smallFontSize +
-    '; margin:' +
-    mWidth +
-    ';">' +
-    '			<li>A/Prof Steven Most (s.most@unsw.edu.au)</li></ul>' +
-    '	<p style="text-align:left;line-height:120%;font-size:' +
-    smallFontSize +
-    ';margin:' +
-    mWidth +
-    ';">' +
-    '	<b> Contact for feelings of distress </b><br>' +
-    '	The NHS provides links and contact information for a number of free mental health resources, including 24-hour advice and support and free listening services.' +
-    ' These can be found at the following webpage: <a href="https://www.nhs.uk/nhs-services/mental-health-services/"target="_blank"> NHS Support Services </a>' +
-    '			<p style="text-align:left;line-height:120%;font-size:' +
-    smallFontSize +
-    ';margin:' +
-    mWidth +
-    ';">' +
-    '	<b>13. What if I have a complaint or concerns about the research study?</b><br>' +
-    '		If you have a complaint regarding any aspect of the study or the way it is being conducted, please contact the UNSW Human Ethics Coordinator:' +
-    '	<ul style="text-align:left;line-height:120%;font-size:' +
-    smallFontSize +
-    '; margin:' +
-    mWidth +
-    ';">' +
-    '			<li>Phone number: 0293856222</li>' +
-    '			<li>Email: humanethics@unsw.edu.au</li>' +
-    '			<li>Reference Number: 3670</li>' +
-    '		</ul>' +
-    '			Please keep a copy of this information sheet (you can download the pdf <a href="InformedConsent_3670.pdf" target="_blank">here</a>).<br>' +
-    '			<br>' +
-    '			<p style="text-align:center;"><b>PARTICIPANT CONSENT</b></p>' +
-    '			<p style="text-align:left;font-size:' +
-    smallFontSize +
-    ';margin:' +
-    mWidth +
-    ';">By continuing, you are making a decision whether or not to participate.  Clicking the button below indicates that, having read the information provided on the participant information sheet, you have decided to participate.<br><br></p>',
-  choices: ['<p style="font-size:130%;line-height:0%;"><b>I agree!</b></p>'],
-  prompt:
-    '<p style="text-align:left;font-size:' +
-    smallFontSize +
-    ';margin:' +
-    mWidth +
-    ';"><br>Please close the browser window if you do not wish to participate.<br><br></p>'
-}
-
-//******Debriefing*****
-var debrief = {
-  type: 'html-button-response',
-  stimulus:
-    '<p style="text-align:right;font-size:' +
-    smallFontSize +
-    ';margin:' +
-    mWidth +
-    ';margin-top:30px;">Approval No 3670</p>' +
-    '			<p style="text-align:center;"><b>THE UNIVERSITY OF NEW SOUTH WALES<br>' +
-    '			Additional Study (Debriefing) Information</b><br><br><b>Rapid Search & Appraisal</b><br></p>' +
-    '<b>THANK YOU FOR PARTICIPATING. REST ASSURED THAT ALL UNPLEASANT IMAGES USED IN THIS STUDY WERE STAGED USING SPECIAL EFFECTS AND MAKEUP.</b><br>' +
-    '			<p style="text-align:left;line-height:120%;font-size:' +
-    smallFontSize +
-    ';margin:' +
-    mWidth +
-    ';"><b>(a) What are the research questions?</b><br>' +
-    '			The study investigates whether knowing that emotional averse stimuli are fake changes their impact on perception, impact on memory and how people subjectively rate their intensity<br><br>' +
-    '			<b>(b)	How does this study extend previous research on this topic?</b><br>' +
-    '			Previous research has consistently demonstrated an effect known as emotion-induced blindness, where emotional images embedded in a rapid stream impair the ability to see a subsequent target. Emotional stimuli also tend to be remembered better. The current study aims to investigate whether these effects are driven purely by the content of the images or can be modulated by how people think about the pictures (e.g., knowing that they are fake). In this experiment, half of the participants were told that the pictures were fake at the start of the experiment and half were not told this until the end.<br><br>' +
-    '			<b>(c)	What are some potential real-world implications of this research?</b><br>' +
-    '			Cognitive appraisal is the assessment of an emotional situation, where a person evaluates how that situation will affect them by interpreting different aspects of that situation. The appraisal of a stimulus as threatening or disturbing often leads to responses such as stress and fear. This study aims to examine whether influencing the cognitive appraisal of threatening or disturbing stimuli will lower the extent to which they impair awareness and response to target stimuli. This may help researchers better understand strategies for reducing the trauma of witnessing upsetting scenes in the real world. <br><br>' +
-    '			<b>(d)	What is a potential issue or limitation of the study?</b><br>' +
-    '			A limitation with the design of the study is the reliance on participant ability to report how emotional they find a stimulus to be. Not everyone has equal insight into their emotional reactions. A more objective measure of emotional response could include the galvanic skin response, a measure of physiological arousal. However, as this study will be run online, this is not feasible. <br><br>' +
-    '			<b>(e)	What is the methodology of this study?</b><br>' +
-    '			The experiment is a 2 x 2 between-subjects design. The first independent variable is whether participants are told that the aversive stimuli are fake at the start of the experiment. The second independent variable is the emotional valence of the critical pictures (negative vs. neutral). There are three dependent variables. The first is the mean percentage accuracy in reporting the correct target orientation in the emotion-induced blindness task. The second is the subjective rating of unpleasantness (1=pleasant, 9 = unpleasant) and arousal (1=calm, 9= highly arousing) for emotional distractors. The third is how well participants remembered the critical distractors in a surprise memory test. <br><br>' +
-    '			<b>(f)	Is there any further reading I can do if I am interested in this topic?</b><br>' +
-    '			For more information about the phenomenon of emotion-induced blindness, see:<br>' +
-    '		<ul style="text-align:left;line-height:120%;font-size:' +
-    smallFontSize +
-    '; margin:' +
-    mWidth +
-    ';">' +
-    '			<li>Most, S. B., Chun, M. M., Widders, D. M., & Zald, D. H. (2005). Attentional rubbernecking: Cognitive control and personality in emotion-induced blindness. Psychonomic Bulletin & Review, 12(4), 654-661. https://doi.org/10.3758/BF03196754</li>' +
-    '			<li>Wang, L., Kennedy, B. L., & Most, S. B. (2012). When emotion blinds: A spatiotemporal competition account of emotion-induced blindness. Frontiers in Psychology, 3, 438. https://doi.org/10.3389/fpsyg.2012.00438</li>' +
-    '			</ul>' +
-    '			<p style="text-align:left;line-height:120%;font-size:' +
-    smallFontSize +
-    ';margin:' +
-    mWidth +
-    ';">' +
-    '			Please keep a copy of this information sheet (you can download the pdf <a href="Writtendebrief_3670.pdf" target="_blank">here</a>).<br>' +
-    '			<br>' +
-    '			<p style="text-align:center;"><b>PARTICIPANT CONFIRMATION</b></p>' +
-    '			<p style="text-align:center;font-size:' +
-    smallFontSize +
-    ';margin:' +
-    mWidth +
-    ';">Clicking the button below indicates that you have read and understood this debrief information.<br><br></p>',
-
-  choices: [
-    '<p style="font-size:130%;line-height:0%;"><b>I have read the information!</b></p>'
-  ],
-  prompt:
-    '<br>Clicking here will finish the experiment and redirect you back to Prolific to receive your payment. Thank you for participating.'
-}
-
-//SHOW THREE IMAGES TO MAKE SURE THAT THEY DO REALLY WANT TO CONTINUE
-
-var preExposurePreamble = {
+let preExposurePreamble = {
   type: 'html-keyboard-response',
   stimulus:
     'Thank you for agreeing to participate in our study. As mentioned in the informed consent document, this study will involve viewing unpleasant (in addition to neutral) images. <br><br> In order to 		give you an idea of what to expect, we will briefly show you four of these images now, with a pause in between each one. <br><br> If at any stage you decide that you do not in fact 		wish to participate, you can simply close this browser window. When you are ready to see the first image, press any key.'
 }
 
-var okToContinue = {
+let okToContinue = {
   type: 'html-keyboard-response',
   stimulus:
     'Do you wish to continue? <br><br> Press any key to continue or simply close this browser window if you wish to withdraw from the study.'
 }
 
-var PreExposureIAPS = {
+let PreExposureIAPS = {
   type: 'image-keyboard-response',
   stimulus: jsPsych.timelineVariable('stimulus'),
   trial_duration: 1000,
   choices: jsPsych.NO_KEYS
 }
 
-var IAPS_preview = [
-  { stimulus: previewNegFilenames[0] },
-  { stimulus: previewNegFilenames[1] },
-  { stimulus: previewNegFilenames[2] },
-  { stimulus: previewNegFilenames[3] }
+let IAPS_preview = [
+  { stimulus: previewNegativeFileNames[0] },
+  { stimulus: previewNegativeFileNames[1] },
+  { stimulus: previewNegativeFileNames[2] },
+  { stimulus: previewNegativeFileNames[3] }
 ]
 
-var imagePreExposureProcedure = {
+let imagePreExposureProcedure = {
   timeline: [PreExposureIAPS, okToContinue],
   timeline_variables: IAPS_preview
 }
 
 // *******************INSTRUCTION-D******************
 //Note: edited first INSTRUCT set to contain statement that stimuli are fake
-var INSTRUCTD = {
+let INSTRUCTD = {
   //[STEVE: DON'T NEED INSTRUCTD OR INSTRUCTND]
   type: 'html-button-response',
   stimulus:
@@ -1148,7 +881,7 @@ var INSTRUCTD = {
   ]
 }
 
-var INSTRUCTND = {
+let INSTRUCTND = {
   type: 'html-button-response',
   stimulus:
     '<p style="text-align:center;"><b>IMPORTANT NOTE BEFORE YOU START THE REAL EXPERIMENT</b><br><br>' +
@@ -1173,18 +906,18 @@ var INSTRUCTND = {
 
 //check they have read the instructions [STEVE: DON'T NEED THIS SECTION ON CHECKING WHETHER THEY HAVE READ INSTRUCTIONS, BUT MAYBE KEEP IF YOU WANT TO TEST THAT THEY UNDERSTAND]
 
-var distInstruct_Q0_answers
+let distInstruct_Q0_answers
 
 distInstruct_Q0_answers = [
   'Fake or staged',
   ' Real images taken from real events'
 ]
 
-var distInstruct_correctstring = '{"Q0":"' + distInstruct_Q0_answers[0] + '"}'
+let distInstruct_correctstring = '{"Q0":"' + distInstruct_Q0_answers[0] + '"}'
 
-var distInstruct_repeatInstructions = true
+let distInstruct_repeatInstructions = true
 
-var distInstruct_instruction_check = {
+let distInstruct_instruction_check = {
   type: 'survey-multi-choice',
   preamble: [
     "<p style='text-align:center;'><b>Check your knowledge before you continue!</b></p>"
@@ -1209,7 +942,7 @@ var distInstruct_instruction_check = {
   }
 }
 
-var distInstruct_check_failed_display = {
+let distInstruct_check_failed_display = {
   type: 'html-button-response',
   stimulus: '<p><b>Unfortunately your answer was incorrect.</b></p>',
   choices: ['<p>Click here to read the instructions again</p>'],
@@ -1218,13 +951,13 @@ var distInstruct_check_failed_display = {
   post_trial_gap: 100
 }
 
-var distInstruct_check_failed_conditional = {
+let distInstruct_check_failed_conditional = {
   timeline: [distInstruct_check_failed_display],
   conditional_function: function () {
     return distInstruct_repeatInstructions // If this is true, it will execute timeline (show failure screen)
   }
 }
-var loop_distInstruct_instructions = {
+let loop_distInstruct_instructions = {
   timeline: [
     INSTRUCTD,
     distInstruct_instruction_check,
@@ -1237,10 +970,10 @@ var loop_distInstruct_instructions = {
 
 //**************Picture graphic/arousing questions**********************
 
-var MCHECKAoptions = ['1.', '2', '3', '4', '5', '6', '7', '8', '9.']
+let MCHECKAoptions = ['1.', '2', '3', '4', '5', '6', '7', '8', '9.']
 
 // please edit the preamble and the prompts. The name should just be the num of the question.
-var picResponse = {
+let picResponse = {
   type: 'survey-multi-choice',
   preamble:
     '<p style=";margin:10px;">During this experiment, you saw several images that were graphic and unpleasant. Please read each statement below and select the answer that best represents your OVERALL FEELING to these images. Your answers will remain anonymous and confidential so please be honest.</p>',
@@ -1267,7 +1000,7 @@ var picResponse = {
 //*************Did they follow instructions**********************
 //To change to percentage of images that participants thought were fake
 
-var percentageOptions = [
+let percentageOptions = [
   '0%',
   '10%',
   '20%',
@@ -1282,7 +1015,7 @@ var percentageOptions = [
 ]
 
 // please edit the preamble and the prompts. The name should just be the num of the question.
-var percentageReal = {
+let percentageReal = {
   type: 'survey-multi-choice',
   preamble:
     'You are nearly finished with the experiment. We just have a few questions to ask  so please use the mouse to respod.<br><br> In this experiment you were shown some unpleasant and graphic images.',
@@ -1297,7 +1030,7 @@ var percentageReal = {
   ]
 }
 
-var if_node_percentReal = {
+let if_node_percentReal = {
   timeline: [percentageReal],
   conditional_function: function () {
     if (quitButtonCount == 1) {
@@ -1307,7 +1040,7 @@ var if_node_percentReal = {
   }
 }
 
-var NEURinstruction = {
+let NEURinstruction = {
   type: 'html-keyboard-response',
   stimulus:
     'We will start the experiment by asking you to complete a short questionnaire.<br><br>' +
@@ -1320,10 +1053,10 @@ var NEURinstruction = {
 //**************NEUROTICISM Q***********************
 
 //The same response key will be given for all questions right? So just carefully copy the possible responses below between the " "
-var NEURoptions = ['Yes', 'No', 'Rather Not Say']
+let NEURoptions = ['Yes', 'No', 'Rather Not Say']
 
 // please edit the preamble and the prompts. The name should just be the num of the question.
-var NEUR = {
+let NEUR = {
   type: 'survey-multi-choice',
   preamble:
     'Please read each statement and decide how well it describes you by selecting the appropriate answer. There are no right or wrong answers. Your answers will remain anonymous and confidential so please be honest.',
@@ -1403,37 +1136,9 @@ var NEUR = {
   ]
 }
 
-///DEMOGRAPHIC QUESTIONS
-var demographics = {
-  type: 'demographic-response',
-  stimulus:
-    '            <p style="text-align:left;font-size:110%"><b>Demographic information:</b></p>' +
-    '			<p style="text-align:left;">You are nearly finished! We need the following information for our records, but it ' +
-    '			is kept completely separate from information about your Prolfic account.' + //[STEVE: DELETE REFERENCE TO PROLIFIC]
-    '           As long as you finish the experiment you will get paid no matter what you put here,' +
-    '           so please be honest.<br><br>' +
-    '			<!-- Gender -->' +
-    '           <label for="gender"><b>Gender: &nbsp;</b></label>' +
-    '           <input type="radio" name="gender" value="male" /> Male &nbsp; ' +
-    '           <input type="radio" name="gender" value="female" /> Female &nbsp;' +
-    '           <input type="radio" name="gender" value="other" /> Other<br /><br />' +
-    '			<!-- Age -->' +
-    '           <label for="age (in years)"><b>Age: &nbsp;</b></label><input id="age" name="age" /><br /><br />' +
-    '			<br><br><br>',
-
-  choices: ['<p style="font-size:130%;line-height:0%;"><b>Next ></b></p>'],
-
-  on_finish: function (data) {
-    jsPsych.data.addDataToLastTrial({
-      gender: p_gender,
-      age: p_age
-    })
-  }
-}
-
 // ******************* MAIN LOOPS ******************
 
-var loop_RSVPTrials = {
+let loop_RSVPTrials = {
   timeline: [runFixation, runRSVPtrial, runRSVPresponse],
 
   loop_function: function () {
@@ -1446,7 +1151,7 @@ var loop_RSVPTrials = {
   }
 }
 
-var loop_RSVPBlocks = {
+let loop_RSVPBlocks = {
   timeline: [nextBlock, loop_RSVPTrials],
   loop_function: function () {
     blockNum++
@@ -1459,7 +1164,7 @@ var loop_RSVPBlocks = {
   }
 }
 
-var loop_memTrials = {
+let loop_memTrials = {
   timeline: [PressSpacebartrial, runFixation, memoryTaskTrials],
   loop_function: function () {
     trialNumInBlock++
@@ -1472,7 +1177,7 @@ var loop_memTrials = {
   }
 }
 
-var checkBlockBreak = {
+let checkBlockBreak = {
   // No block break after final memory block
   timeline: [memBlockBreak],
   conditional_function: function () {
@@ -1484,7 +1189,7 @@ var checkBlockBreak = {
   }
 }
 
-var loop_memBlocks = {
+let loop_memBlocks = {
   timeline: [loop_memTrials, checkBlockBreak],
   loop_function: function () {
     memBlockNum++
@@ -1496,7 +1201,7 @@ var loop_memBlocks = {
     }
   }
 }
-var if_node_memBlock = {
+let if_node_memBlock = {
   timeline: [loop_memBlocks],
   conditional_function: function () {
     if (quitButtonCount == 1) {
@@ -1505,7 +1210,7 @@ var if_node_memBlock = {
     }
   }
 }
-var if_node_picQDemo = {
+let if_node_picQDemo = {
   timeline: [picResponse, demographics],
   conditional_function: function () {
     if (quitButtonCount == 1) {
@@ -1517,14 +1222,13 @@ var if_node_picQDemo = {
 
 // ******************* FADES ******************
 
-var fadeToBlack
-var fadeToWhite
-var fadeStep = 2
-var lightnessVal
+let fadeToBlack
+let fadeToWhite
+let fadeStep = 2
 
-var fadeDuration = (17 * 100) / fadeStep // Assume 60 Hz refresh (so 17ms frame update)
+let fadeDuration = (17 * 100) / fadeStep // Assume 60 Hz refresh (so 17ms frame update)
 
-var fadeToBlackTrial = {
+let fadeToBlackTrial = {
   type: 'html-keyboard-response',
   stimulus: '',
   trial_duration: 1,
@@ -1536,7 +1240,7 @@ var fadeToBlackTrial = {
   }
 }
 
-var fadeToWhiteTrial = {
+let fadeToWhiteTrial = {
   type: 'html-keyboard-response',
   stimulus: '',
   trial_duration: 1,
@@ -1548,7 +1252,7 @@ var fadeToWhiteTrial = {
   }
 }
 
-var usingComputer = true
+let usingComputer = true
 ;(function (a) {
   if (
     /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(
@@ -1561,7 +1265,7 @@ var usingComputer = true
     usingComputer = false
 })(navigator.userAgent || navigator.vendor || window.opera)
 
-var using_mobile_device = {
+let using_mobile_device = {
   type: 'instructions',
   pages: [
     '<p style="text-align:left;font-size:150%">You seem to be using a mobile device so you will not currently be able to complete this survey.<br><br>To complete this survey, please visit this website using a computer with a keyboard and mouse/trackpad.</p>'
@@ -1570,7 +1274,7 @@ var using_mobile_device = {
 
 // ******************* SET TIMELINE AND RUN EXPT ******************
 
-var exptTimeline = []
+let exptTimeline = []
 
 if (usingComputer) {
   exptTimeline.push(welcome1)
@@ -1643,10 +1347,10 @@ if (jatosVersion == false) {
   jatos.onLoad(function () {
     /* start the experiment with jatos wrapping AND set up the Prolific talk back*/
     // ---------- subject info ----------
-    var prolific_id = jatos.urlQueryParameters.PROLIFIC_PID //
-    var completion_url =
+    let prolific_id = jatos.urlQueryParameters.PROLIFIC_PID //
+    let completion_url =
       'https://app.prolific.co/submissions/complete?cc=CDUKJ5BN'
-    var finish_msg =
+    let finish_msg =
       'All done! Please click <a href="' +
       completion_url +
       '">here</a> to be returned to Prolific and receive your completion code notification.'
@@ -1660,7 +1364,7 @@ if (jatosVersion == false) {
       display_element: jspsychTargetMLP,
       timeline: exptTimeline,
       on_finish: function () {
-        var results = jsPsych.data
+        let results = jsPsych.data
           .get()
           .ignore(['internal_node_id', 'button_pressed'])
           .csv()
@@ -1711,7 +1415,7 @@ function fadeToWhiteFn () {
 }
 
 function shuffleArray (myArray) {
-  var randNum, tempStore, j
+  let randNum, tempStore, j
   for (j = myArray.length; j; j--) {
     randNum = Math.floor(Math.random() * j)
     tempStore = myArray[j - 1]
