@@ -37,6 +37,8 @@ import { fixationCross, imageFilenames, picStimuli, positiveImageFilePaths, neut
 
 import { previewPositiveFilenames, positiveFileNames, neutFilenames, previewNegFilenames, standardFilenames, target0Filenames, target1Filenames } from "./modules/imageFilenames.js"
 
+import { dass21 } from './modules/dass21.js'
+
 let lightnessVal = 100
 document.body.style.backgroundColor = 'hsl(0,0%,' + lightnessVal + '%)'
 
@@ -825,11 +827,11 @@ let mWidth = '16px 80px'
 
 // ETHICS ETC
 
-let preExposurePreamble = {
-  type: 'html-keyboard-response',
-  stimulus:
-    'Thank you for agreeing to participate in our study. As mentioned in the informed consent document, this study will involve viewing unpleasant (in addition to neutral) images. <br><br> In order to 		give you an idea of what to expect, we will briefly show you four of these images now, with a pause in between each one. <br><br> If at any stage you decide that you do not in fact 		wish to participate, you can simply close this browser window. When you are ready to see the first image, press any key.'
-}
+// let preExposurePreamble = {
+//   type: 'html-keyboard-response',
+//   stimulus:
+//     'Thank you for agreeing to participate in our study. As mentioned in the informed consent document, this study will involve viewing unpleasant (in addition to neutral) images. <br><br> In order to 		give you an idea of what to expect, we will briefly show you four of these images now, with a pause in between each one. <br><br> If at any stage you decide that you do not in fact 		wish to participate, you can simply close this browser window. When you are ready to see the first image, press any key.'
+// }
 
 let okToContinue = {
   type: 'html-keyboard-response',
@@ -844,17 +846,17 @@ let PreExposureIAPS = {
   choices: jsPsych.NO_KEYS
 }
 
-let IAPS_preview = [
-  { stimulus: previewNegativeFileNames[0] },
-  { stimulus: previewNegativeFileNames[1] },
-  { stimulus: previewNegativeFileNames[2] },
-  { stimulus: previewNegativeFileNames[3] }
-]
+// let IAPS_preview = [
+//   { stimulus: previewNegativeFileNames[0] },
+//   { stimulus: previewNegativeFileNames[1] },
+//   { stimulus: previewNegativeFileNames[2] },
+//   { stimulus: previewNegativeFileNames[3] }
+// ]
 
-let imagePreExposureProcedure = {
-  timeline: [PreExposureIAPS, okToContinue],
-  timeline_variables: IAPS_preview
-}
+// let imagePreExposureProcedure = {
+//   timeline: [PreExposureIAPS, okToContinue],
+//   timeline_variables: IAPS_preview
+// }
 
 // *******************INSTRUCTION-D******************
 //Note: edited first INSTRUCT set to contain statement that stimuli are fake
@@ -1053,88 +1055,89 @@ let NEURinstruction = {
 //**************NEUROTICISM Q***********************
 
 //The same response key will be given for all questions right? So just carefully copy the possible responses below between the " "
-let NEURoptions = ['Yes', 'No', 'Rather Not Say']
+// let NEURoptions = ['Yes', 'No', 'Rather Not Say']
 
 // please edit the preamble and the prompts. The name should just be the num of the question.
-let NEUR = {
-  type: 'survey-multi-choice',
-  preamble:
-    'Please read each statement and decide how well it describes you by selecting the appropriate answer. There are no right or wrong answers. Your answers will remain anonymous and confidential so please be honest.',
-  questions: [
-    {
-      prompt: '1. Does your mood often go up and down?',
-      name: 'NEUR1',
-      options: NEURoptions,
-      required: true
-    },
-    {
-      prompt: '2. Do you ever feel ‘just miserable’ for no reason?',
-      name: 'NEUR2',
-      options: NEURoptions,
-      required: true
-    },
-    {
-      prompt: '3. Are you an irritable person?',
-      name: 'NEUR3',
-      options: NEURoptions,
-      required: true
-    },
-    {
-      prompt: '4. Are your feelings easily hurt?',
-      name: 'NEUR4',
-      options: NEURoptions,
-      required: true
-    },
-    {
-      prompt: '5. Do you often feel fed up?',
-      name: 'NEUR5',
-      options: NEURoptions,
-      required: true
-    },
-    {
-      prompt: '6. Would you call yourself a nervous person?',
-      name: 'NEUR6',
-      options: NEURoptions,
-      required: true
-    },
-    {
-      prompt: '7. Are you a worrier?',
-      name: 'NEUR7',
-      options: NEURoptions,
-      required: true
-    },
-    {
-      prompt: '8. Would you call yourself tense or highly strung?',
-      name: 'NEUR8',
-      options: NEURoptions,
-      required: true
-    },
-    {
-      prompt: '9. Do you worry too long after embarrassing experiences?',
-      name: 'NEUR9',
-      options: NEURoptions,
-      required: true
-    },
-    {
-      prompt: '10. Do you suffer from nerves?',
-      name: 'NEUR10',
-      options: NEURoptions,
-      required: true
-    },
-    {
-      prompt: '11. Do you often feel lonely?',
-      name: 'NEUR11',
-      options: NEURoptions,
-      required: true
-    },
-    {
-      prompt: '12. Are you often troubled about feelings of guilt?',
-      name: 'NEUR12',
-      options: NEURoptions,
-      required: true
-    }
-  ]
-}
+// let NEUR = {
+//   type: 'survey-multi-choice',
+//   preamble:
+//     'Please read each statement and decide how well it describes you by selecting the appropriate answer. There are no right or wrong answers. Your answers will remain anonymous and confidential so please be honest.',
+//   questions: [
+//     {
+//       prompt: '1. Does your mood often go up and down?',
+//       name: 'NEUR1',
+//       options: NEURoptions,
+//       required: true
+//     },
+//     {
+//       prompt: '2. Do you ever feel ‘just miserable’ for no reason?',
+//       name: 'NEUR2',
+//       options: NEURoptions,
+//       required: true
+//     },
+//     {
+//       prompt: '3. Are you an irritable person?',
+//       name: 'NEUR3',
+//       options: NEURoptions,
+//       required: true
+//     },
+//     {
+//       prompt: '4. Are your feelings easily hurt?',
+//       name: 'NEUR4',
+//       options: NEURoptions,
+//       required: true
+//     },
+//     {
+//       prompt: '5. Do you often feel fed up?',
+//       name: 'NEUR5',
+//       options: NEURoptions,
+//       required: true
+//     },
+//     {
+//       prompt: '6. Would you call yourself a nervous person?',
+//       name: 'NEUR6',
+//       options: NEURoptions,
+//       required: true
+//     },
+//     {
+//       prompt: '7. Are you a worrier?',
+//       name: 'NEUR7',
+//       options: NEURoptions,
+//       required: true
+//     },
+//     {
+//       prompt: '8. Would you call yourself tense or highly strung?',
+//       name: 'NEUR8',
+//       options: NEURoptions,
+//       required: true
+//     },
+//     {
+//       prompt: '9. Do you worry too long after embarrassing experiences?',
+//       name: 'NEUR9',
+//       options: NEURoptions,
+//       required: true
+//     },
+//     {
+//       prompt: '10. Do you suffer from nerves?',
+//       name: 'NEUR10',
+//       options: NEURoptions,
+//       required: true
+//     },
+//     {
+//       prompt: '11. Do you often feel lonely?',
+//       name: 'NEUR11',
+//       options: NEURoptions,
+//       required: true
+//     },
+//     {
+//       prompt: '12. Are you often troubled about feelings of guilt?',
+//       name: 'NEUR12',
+//       options: NEURoptions,
+//       required: true
+//     }
+//   ]
+// }
+
 
 // ******************* MAIN LOOPS ******************
 
@@ -1280,14 +1283,15 @@ if (usingComputer) {
   exptTimeline.push(welcome1)
   exptTimeline.push(welcome2)
 
-  exptTimeline.push({
-    type: 'fullscreen',
-    fullscreen_mode: true
-  })
-  exptTimeline.push(preExposurePreamble)
-  exptTimeline.push(imagePreExposureProcedure)
+  // exptTimeline.push({
+  //   type: 'fullscreen',
+  //   fullscreen_mode: true
+  // })
+  // exptTimeline.push(preExposurePreamble)
+  // exptTimeline.push(imagePreExposureProcedure)
   exptTimeline.push(NEURinstruction)
-  exptTimeline.push(NEUR) // STEVE: IF YOU WANT QUESTIONNAIRE AFTER EXP, MOVE IN TIMELINE
+  exptTimeline.push(dass21)
+  // exptTimeline.push(NEUR) // STEVE: IF YOU WANT QUESTIONNAIRE AFTER EXP, MOVE IN TIMELINE
   exptTimeline.push(loop_initial_instructions)
   exptTimeline.push(ready_to_start_practice)
   exptTimeline.push(fadeToBlackTrial)
@@ -1311,10 +1315,10 @@ if (usingComputer) {
   } //[REMOVE IF STATEMENT]
   exptTimeline.push(if_node_picQDemo)
   exptTimeline.push(debrief) //save data here.
-  exptTimeline.push({
-    type: 'fullscreen',
-    fullscreen_mode: false
-  })
+  // exptTimeline.push({
+  //   type: 'fullscreen',
+  //   fullscreen_mode: false
+  // })
 } else {
   exptTimeline.push(using_mobile_device)
 }
