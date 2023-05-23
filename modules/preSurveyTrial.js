@@ -1,4 +1,4 @@
-let NEURinstruction = {
+let preTestSurveyIntroduction = {
   type: 'html-keyboard-response',
   stimulus:
     'We will start the experiment by asking you to complete a short questionnaire.<br><br>' +
@@ -8,4 +8,4 @@ let NEURinstruction = {
   response_ends_trial: true
 }
 
-export { NEURinstruction }
+export { preTestSurveyIntroduction }

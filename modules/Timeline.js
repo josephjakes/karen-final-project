@@ -1,13 +1,14 @@
-import { welcome1, welcome2 } from './welcome.js';
+import { welcome1, welcome2 } from './welcomeV2.js';
 import { debrief } from './debrief.js';
 import { dass21 } from './dass21.js';
 import { usingComputer, using_mobile_device } from './usingComputer.js';
 import { loop_RSVPBlocks, loop_practice_trials, first_practice_trial_loop, instr_before_prac_loop, ready_to_start_practice_trial } from './rsvp.js'
 import { fadeToBlackTrial, fadeToWhiteTrial } from './fadeTrials.js'
-import { NEURinstruction } from './preSurveyTrial.js';
+import { preTestSurveyIntroduction } from './preSurveyTrial.js';
 import { loop_initial_instructions, loop_distInstruct_instructions } from './initial_instructions.js';
 import { instructVersion } from './constants.js'
 import { if_node_nextBlockMemory, if_node_memBlock, if_node_picQDemo} from './memory.js';
+import { neurosisSurveyTrial } from './neurosisMeasure.js';
 
 // still fixing
 import { if_node_percentReal, } from './percentageReal.js';
@@ -25,9 +26,9 @@ if (usingComputer) {
   // })
   // exptTimeline.push(preExposurePreamble)
   // exptTimeline.push(imagePreExposureProcedure)
-  exptTimeline.push(NEURinstruction);
+  exptTimeline.push(preTestSurveyIntroduction);
   exptTimeline.push(dass21);
-  // exptTimeline.push(NEUR) // STEVE: IF YOU WANT QUESTIONNAIRE AFTER EXP, MOVE IN TIMELINE
+  // exptTimeline.push(neurosisSurveyTrial) // STEVE: IF YOU WANT QUESTIONNAIRE AFTER EXP, MOVE IN TIMELINE
   exptTimeline.push(loop_initial_instructions);
   exptTimeline.push(ready_to_start_practice_trial);
   exptTimeline.push(fadeToBlackTrial);

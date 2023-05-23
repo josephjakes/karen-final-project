@@ -1,6 +1,6 @@
 let NEURoptions = ['Yes', 'No', 'Rather Not Say']
 
-export let NEUR = {
+let neurosisSurveyTrial = {
   type: 'survey-multi-choice',
   preamble:
     'Please read each statement and decide how well it describes you by selecting the appropriate answer. There are no right or wrong answers. Your answers will remain anonymous and confidential so please be honest.',
@@ -80,4 +80,4 @@ export let NEUR = {
   ]
 }
 
-export { NEURinstruction, NEUR }
+export { neurosisSurveyTrial }

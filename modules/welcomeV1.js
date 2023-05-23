@@ -9,11 +9,18 @@ let welcome = {
   }
 }
 
+welcome.ethics = {}
+welcome.ethics.selection =
+  'You are invited to take part in this research study. The research study aims to investigate how people process rapidly presented images, including unpleasant ones. You have been invited because you are a student taking introductory psychology at UNSW.'
+welcome.ethics.description =
+  'If you decide to take part in the research study, you will be asked to view rapid streams of mostly landscape or architectural images. One of these images will be rotated 90 degrees, and your goal will be to identify whether this image was rotated left or right. There will also be some images of people, some of which will be unpleasantly graphic or violent (e.g., depictions of injury, disfigurement, or death; you will have a chance to view samples prior to' +
+  'beginning the experiment and may withdraw at any time). These images will be presented rapidly, at a rate of 10 per second, but you will see them again for a longer duration at the end of the experiment. You will also be asked questions about your emotional style. We don’t expect this research to cause any harm. However, you may skip any or all written or verbal questions if you wish. Please let the researchers know if you need any assistance for any reason.'
+
 let welcome1 = {
   type: 'html-button-response',
   stimulus: function () {
     return (
-      '<h1 style="text-align:center;">UNSW Sydney</h1>' +
+      '<h1 style="text-align:center;">UNSW Sydney Cognition Lab </h1>' +
       '    <p style="text-align:left;line-height:190%;margin:' +
       mWidth +
       ';"><br>Thank you for applying to participate in this study. ' +
@@ -39,13 +46,6 @@ let welcome1 = {
   choices: ['<p style="font-size:130%;line-height:0%;"><b>START!</b></p>']
 }
 
-welcome.ethics = {}
-welcome.ethics.selection =
-  'You are invited to take part in this research study. The research study aims to investigate how people process rapidly presented images, including unpleasant ones. You have been invited because you are a student taking introductory psychology at UNSW.'
-welcome.ethics.description =
-  'If you decide to take part in the research study, you will be asked to view rapid streams of mostly landscape or architectural images. One of these images will be rotated 90 degrees, and your goal will be to identify whether this image was rotated left or right. There will also be some images of people, some of which will be unpleasantly graphic or violent (e.g., depictions of injury, disfigurement, or death; you will have a chance to view samples prior to' +
-  'beginning the experiment and may withdraw at any time). These images will be presented rapidly, at a rate of 10 per second, but you will see them again for a longer duration at the end of the experiment. You will also be asked questions about your emotional style. We don’t expect this research to cause any harm. However, you may skip any or all written or verbal questions if you wish. Please let the researchers know if you need any assistance for any reason.'
-
 let welcome2 = {
   type: 'html-button-response',
   stimulus:
@@ -53,9 +53,9 @@ let welcome2 = {
     smallFontSize +
     ';margin:' +
     mWidth +
-    ';margin-top:30px;">Approval No 3670</p>' +
+    ';margin-top:30px;">Approval No 3671</p>' +
     '		<p style="text-align:center;"><b>THE UNIVERSITY OF NEW SOUTH WALES<br>' +
-    '			PARTICIPANT INFORMATION STATEMENT</b><br><br><b>Rapid Search & Appraisal</b><br></p>' +
+    '			PARTICIPANT INFORMATION STATEMENT</b><br><br><b>Rapid Target Search</b><br></p>' +
     '			<p style="text-align:left;line-height:120%;font-size:' +
     smallFontSize +
     ';margin:' +
@@ -156,5 +156,6 @@ let welcome2 = {
     mWidth +
     ';"><br>Please close the browser window if you do not wish to participate.<br><br></p>'
 }
+
 
 export { welcome, welcome1, welcome2 }
