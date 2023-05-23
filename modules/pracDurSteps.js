@@ -15,7 +15,7 @@ let numMemPics;
 let numFoilPics;
 let memConditionsTotal = 4; //1 = neg old 2 =  neg_foils, 3 = neut old, 4 = neut foils.
 
-let realVersion = true
+let realVersion = false
 if (realVersion) {
     trialsPerDistractCond = 14; //PerBlock How many trials per condition (14 x neut/14 x negative) x 2 blocks [STEVE: CHANGE THIS IF WE ARE GOING TO CHANGE NUMBER OF STIMULI PER CONDITION]
     numDistractConditions = 2; // neut and negative in this experiment.

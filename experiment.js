@@ -55,7 +55,6 @@ let time =
   today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds()
 let dateTime = date + ' ' + time
 
-let realVersion = true
 let jatosVersion = false
 let instructVersion = Math.round(Math.random()) // 0 = no instructions and 1 = given fake/staged instructions
 console.log(instructVersion)
