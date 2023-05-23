@@ -1,4 +1,5 @@
-export let usingComputer = true;
+let usingComputer = true;
+
 (function (a) {
     if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(
         a
@@ -8,9 +9,12 @@ export let usingComputer = true;
         ))
         usingComputer = false;
 })(navigator.userAgent || navigator.vendor || window.opera);
-export let using_mobile_device = {
+
+let using_mobile_device = {
     type: 'instructions',
     pages: [
         '<p style="text-align:left;font-size:150%">You seem to be using a mobile device so you will not currently be able to complete this survey.<br><br>To complete this survey, please visit this website using a computer with a keyboard and mouse/trackpad.</p>'
     ]
 };
+
+export { usingComputer, using_mobile_device }
